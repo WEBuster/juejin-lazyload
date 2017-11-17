@@ -69,12 +69,14 @@ export default class JuejinLazyload {
   }
 
   getElementList (descriptor) {
-    if (typeof descriptor === 'string') {
+    if (!descriptor) {
+      return []
+    } else if (typeof descriptor === 'string') {
       return [].slice.call(document.querySelectorAll(descriptor))
-    } else if (descriptor instanceof Array) {
-      return descriptor
+    } else if (typeof descriptor.length === 'number') {
+      return [].slice.call(descriptor)
     } else {
-      return descriptor ? [descriptor] : []
+      return [descriptor]
     }
   }
 
