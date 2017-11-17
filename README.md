@@ -1,6 +1,5 @@
 # juejin-lazyload
 
-[![Build Status](https://img.shields.io/travis/WEBuster/juejin-lazyload.svg?style=flat-square)](https://travis-ci.org/WEBuster/juejin-lazyload)
 [![Version](https://img.shields.io/npm/v/juejin-lazyload.svg?style=flat-square)](https://www.npmjs.com/package/juejin-lazyload)
 [![License](https://img.shields.io/npm/l/juejin-lazyload.svg?style=flat-square)](LICENSE)
 
