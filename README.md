@@ -98,7 +98,7 @@ new JuejinLazyload(Element || ElementList || selector, {
 
   // 初始化及 addOrUpdateElement 时调用
   infoGetter: (Element) => ({
-    url: String,   // 图片地址，用以设置 img[src] || :not(img)[background-image]
+    url: String,   // 图片地址，用以设置 IMG 元素的 src 或其它元素的 background-image
     width: Number, // 图片宽度，用以设置加载时透明占位 SVG 宽度
     height: Number // 图片高度，用以设置加载时透明占位 SVG 高度
   }),
