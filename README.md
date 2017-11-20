@@ -88,7 +88,7 @@ new JuejinLazyload(Element || ElementList || selector, {
   threshold: 0,
 
   // 状态更新的最小时间间隔
-  interval: 300,
+  interval: 200,
 
   // 是否启用防抖，待可视状态变化停止时才更新图片状态
   debounce: false,

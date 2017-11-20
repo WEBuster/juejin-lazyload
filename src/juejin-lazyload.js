@@ -10,7 +10,7 @@ import {
 
 const DEFAULT_OPTIONS = {
   threshold: 0,
-  interval: 300,
+  interval: 200,
   debounce: false,
   reactive: true,
   infoGetter: null,
@@ -84,15 +84,14 @@ export default class JuejinLazyload {
     const imgInfo = this.options.infoGetter && this.options.infoGetter(element)
     const info = Object.assign({}, imgInfo, {
       isImg: element.nodeName === 'IMG',
-      loading: false,
-      loaded: false,
-      error: false
+      loading: false
     })
     info.hasPlaceholder = info.isImg && info.width && info.height
     if (info.hasPlaceholder) {
       element.src = getPlaceholderDataUrl(info.width, info.height)
     }
     element[INFO_PROP_NAME] = info
+    this.updateElementClassByState('inited', element)
   }
 
   removeInfo (element) {
@@ -105,9 +104,10 @@ export default class JuejinLazyload {
     if (!this.elementList.length) { return }
     const activeArea = this.getActiveArea()
     this.elementList.forEach(element => {
-      const { loading, loaded, error } = element[INFO_PROP_NAME]
-      if (loading || loaded || error) { return }
-      if (isInArea(activeArea, element.getBoundingClientRect())) {
+      const { loading } = element[INFO_PROP_NAME]
+      const rect = element.getBoundingClientRect()
+      const isInActiveArea = isInArea(activeArea, rect)
+      if (!loading && isInActiveArea) {
         this.loadIamge(element)
       }
     })
@@ -142,10 +142,8 @@ export default class JuejinLazyload {
   loadIamge (element) {
     const info = element[INFO_PROP_NAME]
     const { url, isImg } = info
-    element.classList.add('loading')
     info.loading = true
-    info.loaded = false
-    info.error = false
+    this.updateElementClassByState('loading', element)
     this.invokeStateHook('loading', url, element)
     loadIamge(url, () => {
       if (isImg) {
@@ -153,18 +151,37 @@ export default class JuejinLazyload {
       } else {
         element.style.backgroundImage = `url(${url})`
       }
-      element.classList.remove('loading')
-      element.classList.add('loaded')
-      info.loading = false
-      info.loaded = true
+      this.removeElement(element)
+      this.updateElementClassByState('loaded', element)
       this.invokeStateHook('loaded', url, element)
     }, () => {
-      element.classList.remove('loading')
-      element.classList.add('error')
-      info.loading = false
-      info.error = true
+      this.removeElement(element)
+      this.updateElementClassByState('error', element)
       this.invokeStateHook('error', url, element)
     })
+  }
+
+  updateElementClassByState (state, element) {
+    switch (state) {
+      case 'inited':
+        element.classList.remove('loading')
+        element.classList.remove('loaded')
+        element.classList.remove('error')
+        break
+      case 'loading':
+        element.classList.add('loading')
+        break
+      case 'loaded':
+        element.classList.remove('loading')
+        element.classList.add('loaded')
+        break
+      case 'error':
+        element.classList.remove('loading')
+        element.classList.add('error')
+        break
+      default:
+        // do nothing
+    }
   }
 
   invokeStateHook (state, url, element) {
