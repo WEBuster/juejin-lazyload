@@ -106,7 +106,7 @@ new JuejinLazyload(Element || ElementList || selector, {
   // 可视区域，默认为文档可视区域
   visibleAreaGetter: () => DOMRect,
 
-  // 状态变化钩子，state = 'loading' || 'loaded' || 'error'
+  // 状态变化钩子，state = 'inited' || 'loading' || 'loaded' || 'error'
   onStateChange: (state, url, Element, JuejinLazyload) => {}
 })
 ```
@@ -114,6 +114,7 @@ new JuejinLazyload(Element || ElementList || selector, {
 ### 图片元素状态类
 
 ```bash
+inited  # 已初始化
 loading # 正在加载
 loaded  # 已加载
 error   # 加载失败

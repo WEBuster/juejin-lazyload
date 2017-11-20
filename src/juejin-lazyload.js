@@ -164,6 +164,7 @@ export default class JuejinLazyload {
   updateElementClassByState (state, element) {
     switch (state) {
       case 'inited':
+        element.classList.add('inited')
         element.classList.remove('loading')
         element.classList.remove('loaded')
         element.classList.remove('error')
