@@ -17,15 +17,15 @@
 ### 初始化
 
 ```html
-<img data-src="pic.jpg" src="[placeholder]">
-<div data-src="pic.jpg"></div>
+<img data-src="pic.jpg" class="inited" src="[placeholder]">
+<div data-src="pic.jpg" class="inited"></div>
 ```
 
 ### 加载中
 
 ```html
-<img data-src="pic.jpg" class="loading" src="[placeholder]">
-<div data-src="pic.jpg" class="loading"></div>
+<img data-src="pic.jpg" class="inited loading" src="[placeholder]">
+<div data-src="pic.jpg" class="inited loading"></div>
 ```
 
 `[placeholder]` 为透明占位 SVG 的 Data URL（`data:image/svg+xml,...`），其宽高由 `infoGetter` 得到，不指定则无占位。使用透明占位 SVG 可以使 IMG 元素得到与加载成功状态相同的尺寸布局表现以防止页面跳动。
@@ -33,15 +33,15 @@
 ### 加载成功
 
 ```html
-<img data-src="pic.jpg" class="loaded" src="pic.jpg">
-<div data-src="pic.jpg" class="loaded" style="background-image:url(pic.jpg)"></div>
+<img data-src="pic.jpg" class="inited loaded" src="pic.jpg">
+<div data-src="pic.jpg" class="inited loaded" style="background-image:url(pic.jpg)"></div>
 ```
 
 ### 加载失败
 
 ```html
-<img data-src="pic.jpg" class="error" src="[placeholder]">
-<div data-src="pic.jpg" class="error"></div>
+<img data-src="pic.jpg" class="inited error" src="[placeholder]">
+<div data-src="pic.jpg" class="inited error"></div>
 ```
 
 为防止失败时页面跳动，占位 SVG 保持不变。
