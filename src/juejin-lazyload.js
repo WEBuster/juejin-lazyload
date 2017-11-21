@@ -92,6 +92,7 @@ export default class JuejinLazyload {
     }
     element[INFO_PROP_NAME] = info
     this.updateElementClassByState('inited', element)
+    this.invokeStateHook('inited', info.url, element)
   }
 
   removeInfo (element) {
