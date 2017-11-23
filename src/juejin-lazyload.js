@@ -13,12 +13,14 @@ const DEFAULT_OPTIONS = {
   interval: 200,
   debounce: false,
   reactive: true,
+  eagerShowing: false,
   infoGetter: null,
   visibleAreaGetter: null,
   onStateChange: null
 }
 
 const INFO_PROP_NAME = '__JUEJIN_LAZYLOAD'
+const META_CHECK_INTERVAL = 300
 
 export default class JuejinLazyload {
 
@@ -81,18 +83,26 @@ export default class JuejinLazyload {
   }
 
   initElement (element) {
+    this.attachInfo(element)
+    this.setPlaceholder(element)
+    this.updateElementClassByState('inited', element)
+    this.invokeStateHook('inited', element)
+  }
+
+  attachInfo (element) {
     const imgInfo = this.options.infoGetter && this.options.infoGetter(element)
     const info = Object.assign({}, imgInfo, {
-      isImg: element.nodeName === 'IMG',
       loading: false
     })
-    info.hasPlaceholder = info.isImg && info.width && info.height
-    if (info.hasPlaceholder) {
+    element[INFO_PROP_NAME] = info
+  }
+
+  setPlaceholder (element) {
+    const info = element[INFO_PROP_NAME]
+    const isImg = element.nodeName === 'IMG'
+    if (isImg && info.width && info.height) {
       element.src = getPlaceholderDataUrl(info.width, info.height)
     }
-    element[INFO_PROP_NAME] = info
-    this.updateElementClassByState('inited', element)
-    this.invokeStateHook('inited', info.url, element)
   }
 
   removeInfo (element) {
@@ -142,23 +152,30 @@ export default class JuejinLazyload {
 
   loadIamge (element) {
     const info = element[INFO_PROP_NAME]
-    const { url, isImg } = info
+    const { url } = info
     info.loading = true
     this.updateElementClassByState('loading', element)
-    this.invokeStateHook('loading', url, element)
-    loadIamge(url, () => {
-      if (isImg) {
-        element.src = url
-      } else {
-        element.style.backgroundImage = `url(${url})`
+    this.invokeStateHook('loading', element)
+    loadIamge(url, {
+      onStart: (url, image) => {
+        if (this.options.eagerShowing) {
+          this.onMetaLoaded(image, () => {
+            element.removeAttribute('src')  // necessary
+            element.setAttribute('src', url)
+          })
+        }
+      },
+      onLoaded: () => {
+        this.setElementWithImageUrl(url, element)
+        this.updateElementClassByState('loaded', element)
+        this.invokeStateHook('loaded', element)
+        this.removeElement(element)
+      },
+      onError: () => {
+        this.updateElementClassByState('error', element)
+        this.invokeStateHook('error', element)
+        this.removeElement(element)
       }
-      this.removeElement(element)
-      this.updateElementClassByState('loaded', element)
-      this.invokeStateHook('loaded', url, element)
-    }, () => {
-      this.removeElement(element)
-      this.updateElementClassByState('error', element)
-      this.invokeStateHook('error', url, element)
     })
   }
 
@@ -186,10 +203,31 @@ export default class JuejinLazyload {
     }
   }
 
-  invokeStateHook (state, url, element) {
+  invokeStateHook (state, element) {
     if (this.options.onStateChange) {
+      const { url } = element[INFO_PROP_NAME]
       this.options.onStateChange(state, url, element, this)
     }
+  }
+
+  setElementWithImageUrl (url, element) {
+    if (element.nodeName === 'IMG') {
+      element.src = url
+    } else {
+      element.style.backgroundImage = `url(${url})`
+    }
+  }
+
+  onMetaLoaded (image, callback) {
+    const token = setInterval(() => {
+      if (image.naturalWidth) {
+        stop()
+        callback()
+      }
+    }, META_CHECK_INTERVAL)
+    const stop = () => clearInterval(token)
+    on(image, 'load', stop)
+    on(image, 'error', stop)
   }
 
   destroy () {

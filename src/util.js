@@ -13,12 +13,12 @@ export function getViewportSize () {
   }
 }
 
-export function loadIamge (url, onLoaded, onError) {
-  if (!url) { return }
+export function loadIamge (url, { onStart, onLoaded, onError }) {
   const image = new Image()
-  image.onload = function () { onLoaded && onLoaded(url) }
-  image.onerror = function () { onError && onError(url) }
+  image.onload = function () { onLoaded && onLoaded(url, image) }
+  image.onerror = function () { onError && onError(url, image) }
   image.src = url
+  onStart && onStart(url, image)
 }
 
 export function throttle (fn, interval) {

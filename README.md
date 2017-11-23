@@ -96,6 +96,9 @@ new JuejinLazyload(Element || ElementList || selector, {
   // 是否自动监听 window 的 scroll 和 resize 事件
   reactive: true,
 
+  // true - 图片头部加载完成后立即显示 | false - 全图加载完成后才显示
+  eagerShowing: false,
+
   // 初始化及 addOrUpdateElement 时调用
   infoGetter: (Element) => ({
     url: String,   // 图片地址，用以设置 IMG 元素的 src 或其它元素的 background-image
